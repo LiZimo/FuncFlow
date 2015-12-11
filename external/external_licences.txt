@@ -1,0 +1,38 @@
+External Licenses 
+================
+
+CVX:
+CVX: A system for disciplined convex programming
+Copyright (C) 2005-2012 Michael C. Grant and Stephen P. Boyd.
+
+Graph Based Visual Saliency:
+-J. Harel, A Saliency Implementation in MATLAB: http://www.klab.caltech.edu/~harel/share/gbvs.php 
+
+SIFTflow:
+-C. Liu, J. Yuen and A. Torralba. 
+SIFT Flow: Dense Correspondence across Scenes and its Applications. 
+IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2010.
+
+DSP:
+Jaechul Kim, Ce Liu, Fei Sha and Kristen Grauman
+Deformable spatial pyramid matching for fast dense correspondences 
+Computer Vision and Pattern Recognition (CVPR), 2013 IEEE Conference on. IEEE, 2013.
+
+Geodesic Object Proposals: 
+-Philipp Krähenbühl and Vladlen Koltun.
+Geodesic Object Proposals. 
+In ECCV 2014.
+
+iCoseg data:
+Dhruv Batra, Adarsh Kowdle, Devi Parikh, Jeibo Luo and Tsuhan Chen. 
+"Interactively Co-segmentating Topically Related Images with Intelligent Scribble Guidance", 
+International Journal of Computer Vision (IJCV), To appear. 
+
+GIST:
+Aude Oliva, Antonio Torralba
+Modeling the shape of the scene: a holistic representation of the spatial envelope
+International Journal of Computer Vision, Vol. 42(3): 145-175, 2001. PDF
+
+SLIC superpixels:
+Copyright (C) 2015 Ecole Polytechnique Federale de Lausanne (EPFL), Switzerland.
+Created by Radhakrishna Achanta on 12/06/15.

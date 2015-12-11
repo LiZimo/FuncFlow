@@ -1,0 +1,14 @@
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/external/Boost.NumPy/libs/numpy/src/CMakeFiles/boost_numpy.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/contour/CMakeFiles/contour.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/python/dataset/CMakeFiles/dataset.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/examples/CMakeFiles/example.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/examples/CMakeFiles/example_learned.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/python/CMakeFiles/gop.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/matlab/CMakeFiles/gop_mex.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/imgproc/CMakeFiles/imgproc.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/external/liblbfgs-1.10/CMakeFiles/lbfgs.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/learning/CMakeFiles/learning.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/external/libsvm-3.17/CMakeFiles/libsvm.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/proposals/CMakeFiles/proposals.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/segmentation/CMakeFiles/segmentation.dir
+/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/build/lib/util/CMakeFiles/util.dir
