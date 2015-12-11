@@ -39,7 +39,7 @@ All_eig_vecs = funcflow_struct.eigvecs;
 All_eig_vals = funcflow_struct.eigvals;
 weights = funcflow_struct.weights_final;
 
-
+rmpath(genpath('./external/dsp-code'));
 
 %% making figures and calculating final IOU scores
 segments = compute_segmentation_from_maps(All_func_maps_start, All_eig_vecs, All_eig_vals, weights, 1);
