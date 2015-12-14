@@ -42,8 +42,8 @@ weights = funcflow_struct.weights_final;
 rmpath(genpath('./external/dsp-code'));
 
 %% making figures and calculating final IOU scores
-segments = compute_segmentation_from_maps(All_func_maps_start, All_eig_vecs, All_eig_vals, weights, 1);
-visualize_output_masks(image_dir_name, segments, All_eig_vecs, params.imgsize);
-[avg, IOUs] = compute_IOUs(image_dir_name, segments, All_eig_vecs, params.imgsize);
+consistent_funcs = compute_consistentfunc_from_maps(All_func_maps_start, All_eig_vecs, All_eig_vals, weights, 1);
+[output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, params.imgsize, [1 2 3 4 5]);
+[avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final);
 fprintf('avg IOU: %f \n', avg);
 
