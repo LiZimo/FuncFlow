@@ -1,8 +1,9 @@
 README
 funcflow v1.0
 ==============================================
-This is a prototype for the funcflow framework using a pixel-basis.  For 
+This is an implementation for the funcflow framework using a pixel-basis.  For 
 details on the method, please refer to the pdf attached in this folder.  
+The code has been tested on Matlab 2015a on a CentOS 7 machine.
 
 In short, the algorithm initializes correspondence among a network of images
 using an off-the-shelf optical flow algorithm such as SIFTflow(http://people.csail.mit.edu/celiu/SIFTflow/) projected into a reduced
