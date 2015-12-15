@@ -1,5 +1,8 @@
 README
 funcflow v1.0
+
+Copyright (c) 2015, Zimo Li
+All rights reserved.
 ==============================================
 This is an implementation for the funcflow framework using a pixel-basis.  For 
 details on the method, please refer to the pdf attached in this folder.  
