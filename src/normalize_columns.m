@@ -1,4 +1,5 @@
 function normalized = normalize_columns(matrix)
+%% normalizes columns of a matrix.  Straightforward.
 
 
 [mr,mc] = size(matrix);

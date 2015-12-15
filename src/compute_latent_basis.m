@@ -10,8 +10,10 @@ function [Y, big_W] = compute_latent_basis(All_X, weights, num_latent_vecs)
 % num_latent_vecs - (int) number of latent vectors to compute
 % ============================================================
 %% OUTPUTS:
-% Y - latent basis
-% big_W - block matrix corresponding to big_W in report
+% Y - (M*N*F x V double, M is number of basis vectors, N is number of images, F is flip (either 0 or 1), V is number of latent vectors) latent basis
+% e.g. To find the corresponding latent basis for image i and flip f, we simply look at Y(  M *[(i - 1)*f + f-1] : M * [(i - 1) * f + f], :)
+
+% big_W - block matrix corresponding to big_W in report.  See section 3 and 5 therein
 %% ============================================================
 
 num_images = size(All_X, 1);

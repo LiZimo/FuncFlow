@@ -1,15 +1,18 @@
 function [all_img1_indicators, all_img2_indicators] = get_pixel_correspondences(im1, im2, which)
-%% INPUT: im1 and im2 are two images
-%% SIFTflowpara are the sift flow parameters.  
-%% If you don't add a SIFTflowpara, cellsize, or gridspacing, there are defaults.
 
-
+%% ====================================================
+%% Builds pixelwise correspondences between two images.  
+%For details,refer to the pdf, section 3 and 
+%<http://people.csail.mit.edu/celiu/SIFTflow/>
+%<http://vision.cs.utexas.edu/projects/dsp/>
+%% INPUT: im1 and im2 are two rgb images
+% ===============================================
 %% OUTPUT:
 %% "all_img1_indicators" is an N x M matrix where N = size(im1,1)*size(im1,2), and M is the number
 %% of correspondences calculated by the sift flow algorithm between the two images.
 %% Each column of "all img1_indicators" represents a linearized version of the 2D image, with
 %% a 1 representing a specific pixel
-
+% ==================================================
 %% "all_img2_indicators" is a K x M matrix where K = size(im2,1)*size(im2,2), and M is the
 %% same as above.  Each column in "all_img2_indicators" is also an indicator, in correspondence with
 %% the indicator in "all_img1_indicators" of the same row.  

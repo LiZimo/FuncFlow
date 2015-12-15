@@ -1,4 +1,15 @@
 function segmented_image = mask_to_segment(mask, image)
+%% ========================================
+%% takes a mask and uses it to generate a red boundary segment on the 
+%%  original image.  uses nice simple little trick with gradient
+% =========================
+%% INPUT:
+% mask - (H x W logical), the input mask
+% image - (H x W x 3 double), rgb image
+% ==========================
+%% OUTPUT:
+% segmented_image - (H x W x 3 double), rgb image with red outline of mask
+%% =========================================
 
     [gx,gy] = gradient(double(logical(mask)));
     non_zero_gradient = (gx.^2 + gy.^2) ~= 0;

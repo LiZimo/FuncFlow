@@ -1,5 +1,16 @@
 function [saliency1, saliency2] = get_saliency_correspondences(im1, im2)
-    
+%% ==============================
+%% Get correspondences between image saliency maps using 'GBVS'
+% for more info, refer to section 3 of the pdf and see
+% <http://www.vision.caltech.edu/~harel/share/gbvs.php>
+%================================
+%% INPUTS: 
+% im1, im2 - two rgb images
+% ==============================
+%% OUTPUTS:
+% saliency1 - (H x W double), saliency map representing likelihood of object
+% saliency2 - (H x W double), saliency map representing likelihood of object
+%% ==============================
     image1 = imresize(im1, [128 128]);
     image2 = imresize(im2, [128 128]);
     

@@ -1,4 +1,4 @@
-function [All_func_maps, Residuals] = update_func_maps( All_eig_vals, All_constraints, latent_bases, latent_constraint,...
+function [All_func_maps, Residuals] = update_func_maps( All_eig_vals, All_constraints, latent_bases, latent_weight,...
 flip, prev_resids, prev_func_maps, saliency_weight, graph_weights)
 %% =============================================================
 %% Update functional maps between all image pairs using correspondences
@@ -13,8 +13,10 @@ flip, prev_resids, prev_func_maps, saliency_weight, graph_weights)
 % prev_resids - (N x F x N x F double) contains the value of objective function for each pair of images' functional map computation from previous iteration
 % prev_func_maps - (N x F x N x F x S x S double, N is #images, F is flip, S is reshaped imgsize) all functional maps between each pair from previous iteration
 % saliency_ weight - (double) weight for the graph-based visual saliency correspondences;
-% latent_bases - latent bases to add to optimization
-% latent_constraint - weight corresponding to aligning latent bases
+% latent_bases - (M*N*F x V double, M is number of basis vectors, N is number of images, F is flip (either 0 or 1), V is number of latent vectors) latent basis
+% e.g. To find the corresponding latent basis for image i and flip f, we simply look at latent_bases(  M *[(i - 1)*f + f-1] : M * [(i - 1) * f + f], :)
+
+% latent_weight - importance assigned to aligning latent bases with funcmaps
 % ===============================================================
 %% OUTPUTS:
 % All_func_maps - (N x F x N x F x S x S double, N is #images, F is flip, S is reshaped imgsize)
@@ -46,12 +48,12 @@ for z = 1:num_images
                 constraints_2(:, end) = constraints_2(:,end)*saliency_weight;               
                 % =========================================================================
                 %% add latent bases into optimization
-                total_constraints_1 = [constraints_1    latent_constraint*basis_constraints1];
-                total_constraints_2 = [constraints_2    latent_constraint*basis_constraints2];
+                total_constraints_1 = [constraints_1    latent_weight*basis_constraints1];
+                total_constraints_2 = [constraints_2    latent_weight*basis_constraints2];
                 % ==========================================================================
                 %% Compute Functional Map here
                 mu = 1000;    
-                num_constraints = size(constraints_1,2);
+                num_constraints = size(total_constraints_1,2);
                 weights = eye(num_constraints);
                 alphas = eye(num_constraints);
                

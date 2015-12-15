@@ -1,3 +1,19 @@
+%% ===================================================================
+%% This is a demonstration of the funcflow algorithm for computing
+%% consistent segmentations.  If you are interested in the code, hopefully
+%% the comments I have added will be sufficient to explain the functions.
+%% For further details, please refer to the pdf in the same directory
+%% as this demo.  If you have further questions, please contact me
+%% at zimoli@uchicago.edu
+%%
+%% Check the license for redistribution details.
+%%
+%% Copyright (c) 2015, Zimo Li
+%% All rights reserved.
+%% ====================================================================
+%
+%
+%
 addpath('./src'); addpath(genpath('./external'));
 
 %% setting up parameter values
@@ -42,8 +58,8 @@ weights = funcflow_struct.weights_final;
 rmpath(genpath('./external/dsp-code'));
 
 %% making figures and calculating final IOU scores
-consistent_funcs = compute_consistentfunc_from_maps(All_func_maps_start, All_eig_vecs, All_eig_vals, weights, 1);
-[output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, params.imgsize, [1 2 3 4 5]);
+consistent_funcs = compute_consistentfunc_from_maps(All_func_maps_start, weights);
+[output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, params.reshaped_imgsize, [1 2 3 4 5]);
 [avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final); % final intersection over union score
 fprintf('avg IOU: %f \n', avg);
 
