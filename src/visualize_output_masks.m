@@ -1,4 +1,7 @@
 function [output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, imgsize, which)
+%% ===============================================================
+%% Computes final mask and creates figures
+
 
 images = dir([image_dir_name '/*.JPEG']);
 if isempty(images)
@@ -24,7 +27,6 @@ for i = 1:length(images)
         consistent_func_im = squeeze(All_eig_vecs(i,1,:,:)) * consistent_func;
     end
     
-    
     I = seg_kmeans(consistent_func_im);
     
     final_seg = reshape(I, [imgsize imgsize]);
@@ -48,8 +50,4 @@ end
         subplot(3, length(which), 1*length(which) + j) ; imshow(segmented_image_rough); title('Rough Thresholding', 'FontSize', 7);
         subplot(3, length(which), 2*length(which) + j); imshow(segmented_image_final); title('Final Output', 'FontSize', 7); 
     end
-
-
-
-
 end

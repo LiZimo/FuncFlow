@@ -1,6 +1,25 @@
 function [All_eig_vecs, All_eig_vals, All_superpixels] = compute_image_basis(image_dir_name, num_eigenvecs,imgsize,flip, radius, numpix, type)
-
-%% ===== Set up Parameters: section 1 =====%
+%% ================================================================
+%% Function computes the reduced basis for each image, at either the pixel or superpixel resolution.  
+%==================================================================
+%% INPUTS:
+% image_dir_name - (str) name of image directory
+% num_eigenvecs - (int) dimension of reduced space to use
+% imgsize - (int) reshaped image size to use
+% flip - 1 (no flipped copies) or 2 (flipped copies)
+% radius - (int) radius to use when computing laplacian for image
+% numpix - (int) number of superpixels to use (only valid for superpixels) 
+% type - (str) either 'pixel' or 'superpixel'
+%==================================================================
+%% OUTPUTS:
+% All_eig_vecs - (N x F cell, N is #images, F is flip) each entry has all the eigenvectors for an image arranged in columns
+% All_eig_vals - (N x F cell, N is #images, F is flip) each entry has all the eigenvalues for an image along the diagonal of a square matrix.  The values correspond to eigenvector entries
+% All_superpixels - (N x F cell, N is #images, F is flip) if type == superpixels, then this contains superpixel labels for each image
+%===================================================================
+% NOTE: if flip is used, then there will also be entries for each flipped copy.  
+% e.g. All_eig_vecs{i,1} will be the basis vectors for the original image and 
+% All_eig_vecs{i,2} will be the basis vectors for the flipped image
+%% ==================================================================
 
 images = dir([image_dir_name '/*.JPEG']);
 if isempty(images)
@@ -13,44 +32,48 @@ end
 All_eig_vecs = cell(length(images),flip);
 All_eig_vals = cell(length(images),flip);
 All_superpixels = cell(length(images), flip);
-% All_laplacians = cell(length(images),flip);
-% All_lplc_diags = cell(length(images),flip);
 for z = 1:length(images)
     
     for z_flip = 1:flip
         if z_flip == 1
-            %im1_whole = imread_ncut([image_dir_name '/' images(z).name], imgsize, imgsize);
             im1_whole = imread([image_dir_name '/' images(z).name]);
-        end
-        if z_flip == 2
-            %im1_whole = flip_image(imread_ncut([image_dir_name '/' images(z).name]), imgsize, imgsize);
+        elseif z_flip == 2
             im1_whole = flip_image(imread([image_dir_name '/' images(z).name]));
-        end
-        
-        if strcmp(type, 'pixel')
-        im1 = double(imresize(im1_whole, [imgsize imgsize]));
-        sigmax = sqrt(size(im1, 1)^2 + size(im1,2)^2)/10;
-        intnsty = sum(im1.^2,3).^(0.5);
-        all_diffs = pdist2(intnsty(:), intnsty(:));
-        sigmav = sqrt(median(all_diffs(:)));
-        [laplcn, D_half] = ICS_laplacian_nf(im1, radius, sigmax, sigmav);
-        
-        opts.issym = 1;
-        opts.isreal = 1;
-        [eig_vecs, eig_vals] = eigs(laplcn, num_eigenvecs, 1e-10,opts);
-        All_superpixels= 0;
-%         All_lplc_diags{z, z_flip} = sparse(D_half);
-%         All_laplacians{z, z_flip} = sparse(laplcn);
-        
- 
-        
-        
+        end       
+        if strcmp(type, 'pixel')                  
+            im1 = double(imresize(im1_whole, [imgsize imgsize]));    
+            % ===============================================
+            %% sigmax given by a tenth of the image diagonal 
+            sigmax = sqrt(size(im1, 1)^2 + size(im1,2)^2)/10;
+            % ===============================================
+            %% sigmav given by the median of all pixel-intensity differences
+            intnsty = sum(im1.^2,3).^(0.5);
+            all_diffs = pdist2(intnsty(:), intnsty(:));
+            sigmav = sqrt(median(all_diffs(:)));
+            %==================================================
+            %% calculate the laplacian of the image here
+            [laplcn, D_half] = ICS_laplacian_nf(im1, radius, sigmax, sigmav);
+            %==================================================
+            %% compute the smallest eigenvectors of the laplcn
+            %% This is the reduced functional space we will be optimizing in
+            opts.issym = 1;
+            opts.isreal = 1;
+            [eig_vecs, eig_vals] = eigs(laplcn, num_eigenvecs, 1e-10,opts);
+            % =================================================
+            %% All_superpixels is set to 0 if using pixels
+            All_superpixels= 0;       
+            
         elseif strcmp(type, 'superpixel')
+            %% use superpixel basis instead
             [laplcn, superpixels, eig_vecs, eig_vals] = compute_superpixel_basis(im1_whole, numpix, num_eigenvecs);
             All_superpixels{z, z_flip} = superpixels;
         end
-            All_eig_vecs{z,z_flip} = eig_vecs;
-            All_eig_vals{z,z_flip} = eig_vals;
+        
+        %% save all basis vectors in a struct
+        %====================================
+        All_eig_vecs{z,z_flip} = eig_vecs;
+        All_eig_vals{z,z_flip} = eig_vals;
+        %====================================
         fprintf('Image (%d / %d) computed \n', z, length(images));
     end
 end

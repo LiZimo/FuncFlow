@@ -1,5 +1,9 @@
 function [avg, IOUs] = compute_IOUs(image_dir_name, all_masks)
-
+%% =================================
+%% Computes Intersection over Union Scores
+%===================================
+% Self explanatory
+%% =================================
 gtmasks = dir([image_dir_name '/GroundTruth/*.JPEG']);
 if isempty(gtmasks)
     gtmasks = dir([image_dir_name '/GroundTruth/*.bmp']);

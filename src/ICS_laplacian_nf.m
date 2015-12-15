@@ -1,23 +1,35 @@
 function [laplcn, D_half] = ICS_laplacian_nf(rgbimage, radius, sigmax, sigmav)
-
+%% =====================================
+%% Computes laplacian for an image.  
+% For more information, refer to section 2 of attached pdf
+% and see <http://www.cs.berkeley.edu/~malik/papers/SM-ncut.pdf>
+% ======================================
+%% INPUTS:
+% rgbimage - (H x W x 3 double), an rgb image
+% radius - (int) pixel radius to use when computing the edge weights
+% sigmax - value of sigma to use in distance term for edge weight
+% sigmav - value of sigma to use in intensity term for edge weight
+% ======================================
+%% OUTPUTS:
+% laplcn - ((H * W) x (H * W) double) the normalized laplacian for the image
+% D_half - ((H * W) x (H * W) double) the diagonal of un-normalized the laplacian
+%% ======================================
 
 if nargin < 2
     radius = 1;
 end
 
-% if ndims(rgbimage)==3
-%     image = double(rgb2gray(rgbimage));
-% else
- image = double(rgbimage);
-% end
-numpixels = size(image,1)*size(image,2);
-
-height = size(image, 1);
-
+image = double(rgbimage);
 all_starts = {};
 all_ends = {};
 all_vals = {};
 
+%% =======================================
+% the strategy here is to shift the image a certain number of spaces, then
+% subtract it from itself before putting it through the gaussian.  This
+% way, we can avoid too many nested forloops and it is parallelizable
+
+% too annoying to explain in detail.  Look through it if you want.
 for i1=1:2*radius + 1
     i = i1 - radius - 1;
     width = ceil(sqrt(radius^2 - i^2+1));
@@ -57,6 +69,7 @@ for i1=1:2*radius + 1
     all_ends{i1} = ends;
     all_vals{i1} = vals;
 end
+% =============================================
 
 
 all_starts = cell2mat(all_starts);
@@ -73,6 +86,7 @@ for i=1:size(laplcn)
     laplcn(i,i) = -sum(laplcn(i,:));
 end
 
+% now we normalize it
 d = diag(laplcn);
 D_half = diag(1./sqrt(d));
 assert(issymmetric(laplcn));

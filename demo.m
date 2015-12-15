@@ -15,12 +15,12 @@ if isempty(images)
 end
 
 %================================================================
-params.imgsize = 64;
+params.reshaped_imgsize = 64; % the imgisze we rescale to when we run the algorithm.  
 params.image_dir_name = image_dir_name;
 params.images = images;
 params.num_eigenvecs = 64; % number of basis vectors to use
 params.useflip = 0; % adds a flipped copy of every image into the network
-params.num_basis_vecs = 1; % number of latent basis vectors to use in alternating optimization
+params.num_basis_vecs = 1; % number of latent basis vectors to use in alternating optimization.  Should be less than the dimension of the reduced space
 params.gbvs_weight = 100; % weight for the graph-based visual saliency correspondences
 params.num_nn = 0; % number of nearest-gist neighbors to use in image-graph; if zero, then we initialize the weights to be uniform
 params.laplacian_radius = 5; % pixel radius to compute basis
@@ -44,6 +44,6 @@ rmpath(genpath('./external/dsp-code'));
 %% making figures and calculating final IOU scores
 consistent_funcs = compute_consistentfunc_from_maps(All_func_maps_start, All_eig_vecs, All_eig_vals, weights, 1);
 [output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, params.imgsize, [1 2 3 4 5]);
-[avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final);
+[avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final); % final intersection over union score
 fprintf('avg IOU: %f \n', avg);
 
