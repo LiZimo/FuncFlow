@@ -1,4 +1,4 @@
-function [output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, imgsize, which)
+function [output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, imgsize, superpixels, which)
 %% ===============================================================
 %% Computes final mask and creates figures
 % for more information on how the rough and final masks are generated,
@@ -10,6 +10,7 @@ function [output_masks_final, output_masks_rough, output_consistentfunc] = visua
 % consistent_funcs - (N x F x M double, N is #images, F is flip, M is#basisvecs)the most consistently aligned function between all images, in reduced basis
 % All_eig_vecs - (N x F cell, N is #images, F is flip) each entry has all the eigenvectors for an image arranged in columns
 % imgsize - (int) imgsize we rehaped to in optimization
+% superpixels - (struct) holds the superpixels labels for all images
 % which - (L x 1 int) which images to visualize final segments for.  if 0,no visualization made
 % ================================================================
 %% OUTPUTS:
@@ -36,10 +37,29 @@ for i = 1:length(images)
     image = imread([image_dir_name '/' images(i).name]);
     consistent_func = squeeze(consistent_funcs(i,1,:));
     consistent_func_im = All_eig_vecs{i,1} * consistent_func; % represent consistent_func into the proper basis  
-    I = seg_kmeans(consistent_func_im); % eliminate the background using kmeans on the heatmap values
     
-    consistent_func_im = reshape(I, [imgsize imgsize]);
-    consistent_func_im = double(imresize(consistent_func_im, [size(image,1) size(image,2)], 'bilinear'));
+    % ==========================================
+    %% If using superpixels, we must color the superpixels back in before postprocessing
+    if iscell(superpixels)
+        labels = superpixels{i,1};
+        regions = length(unique(labels));
+        superpixel_consistent_func_im = zeros(size(image,1), size(image,2));
+        for e = 1:regions
+            superpixel_consistent_func_im(labels == e) = consistent_func_im(e);
+        end
+        consistent_func_im = superpixel_consistent_func_im;
+    end
+    % ===========================================
+    
+    consistent_func_im = seg_kmeans(consistent_func_im); % eliminate the background using kmeans on the heatmap values
+    
+    if ~iscell(superpixels)
+        % if we are in the pixel basis, we must reshape and rescale
+        % everything back to the original size
+        consistent_func_im = reshape(consistent_func_im, [imgsize imgsize]);
+        consistent_func_im = double(imresize(consistent_func_im, [size(image,1) size(image,2)], 'bilinear'));
+    end
+    
     output_consistentfunc{i} = consistent_func_im;
     final_mask = refine_consistentfunc_with_gop(consistent_func_im, image); % refined using 'gop'.  See section 6 of pdf for details.
     output_masks_final{i} = final_mask; % final mask using gop

@@ -14,7 +14,8 @@
 %
 %
 %
-addpath('./src'); addpath(genpath('./external'));
+addpath('./src'); 
+addpath(genpath('./external'));
 
 %% setting up parameter values
 params = struct;
@@ -31,35 +32,28 @@ if isempty(images)
 end
 
 %================================================================
-params.reshaped_imgsize = 64; % the imgisze we rescale to when we run the algorithm.  
+params.imgsize = 64; % the imgisze we rescale to when we run the algorithm.  
 params.image_dir_name = image_dir_name;
 params.images = images;
 params.num_eigenvecs = 64; % number of basis vectors to use
-params.useflip = 0; % adds a flipped copy of every image into the network
-params.num_basis_vecs = 1; % number of latent basis vectors to use in alternating optimization.  Should be less than the dimension of the reduced space
+params.flip = 0; % adds a flipped copy of every image into the network
+params.num_latent_vecs = 1; % number of latent basis vectors to use in alternating optimization.  Should be less than the dimension of the reduced space
 params.gbvs_weight = 100; % weight for the graph-based visual saliency correspondences
 params.num_nn = 0; % number of nearest-gist neighbors to use in image-graph; if zero, then we initialize the weights to be uniform
 params.laplacian_radius = 5; % pixel radius to compute basis
-params.correspondences = 'SIFTflow'; % the other option here is 'DSP'.  
+params.correspondence_type = 'SIFTflow'; % the other option here is 'DSP'.  
+params.domain = 'pixel'; % either 'pixel' or 'superpixel'.  pixel works better in my experience, but both follow the same principle.
+params.num_superpix = 80; % number of superpixels to use if using superpixels.  Should not be greater than sqrt(total number of pixels).
 %=================================================================
-
-
 %% run funcflow on the image directory
 funcflow_struct = run_funcflow(params);
+% ================================================================
+%% making segmentation figures and calculating final IOU scores
 
-
-%% 
-All_func_maps_start = funcflow_struct.funcmaps_init;
-All_func_maps = funcflow_struct.funcmaps_final; 
-All_eig_vecs = funcflow_struct.eigvecs;
-All_eig_vals = funcflow_struct.eigvals;
-weights = funcflow_struct.weights_final;
-
-rmpath(genpath('./external/dsp-code'));
-
-%% making figures and calculating final IOU scores
-consistent_funcs = compute_consistentfunc_from_maps(All_func_maps_start, weights);
-[output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, params.reshaped_imgsize, [1 2 3 4 5]);
+rmpath(genpath('./external/dsp-code')); % I use the matlab kmeans; there is a different implementation in dsp which conflicts.
+consistent_funcs = compute_consistentfunc_from_maps(funcflow_struct.funcmaps_final, funcflow_struct.weights_final);
+[output_masks_final, output_masks_rough, output_consistentfunc] = ... 
+    visualize_output_masks(image_dir_name, consistent_funcs, funcflow_struct.eigvecs, params.imgsize, funcflow_struct.superpixels,[1 2 3 4 5]);
 [avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final); % final intersection over union score
 fprintf('avg IOU: %f \n', avg);
 

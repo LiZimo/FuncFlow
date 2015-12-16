@@ -1,6 +1,8 @@
 function [All_eig_vecs, All_eig_vals, All_superpixels] = compute_image_basis(image_dir_name, num_eigenvecs,imgsize,flip, radius, numpix, type)
 %% ================================================================
 %% Function computes the reduced basis for each image, at either the pixel or superpixel resolution.  
+% For more info, refer to section 2 of the attached pdf
+% and <http://ttic.uchicago.edu/~huangqx/whg-icsfm-13.pdf>
 %==================================================================
 %% INPUTS:
 % image_dir_name - (str) name of image directory
