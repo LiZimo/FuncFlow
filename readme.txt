@@ -49,4 +49,4 @@ sub-directory in your image-directory named "GroundTruth" that has the ground tr
 binary masks of every photo, with the same name.  
 
 There are a number of parameters with explanations in the demo.m file 
-that can be modified. 
+that can be modified.
