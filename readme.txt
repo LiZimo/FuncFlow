@@ -17,7 +17,11 @@ In short, the algorithm initializes correspondence among a network of images
 using an off-the-shelf optical flow algorithm such as SIFTflow(http://people.csail.mit.edu/celiu/SIFTflow/) projected into a reduced
 space.  Then, through alternating optimization, we optimize new correspondences 
 that are consistent across the network of images.  We optimize in the reduced space
-using functional maps, as it is easier to do so.  For details on the method,
+using functional maps, as it is easier to do so.  The final output are 
+consistent segmentations across the image collection, as well as pairwise
+optical flow maps derived from the final maps.
+
+For details on the method,
 refer to the attached PDF in the top level directory.
 
 The code works in both the pixel and superpixel domains.  I have 

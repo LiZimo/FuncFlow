@@ -18,9 +18,8 @@ function [Y, big_W] = compute_latent_basis(All_X, weights, num_latent_vecs)
 
 num_images = size(All_X, 1);
 flip = size(All_X,2);
-num_eigenvecs = size(All_X,6);
+num_eigenvecs = size(All_X{1,1,2,1},2);
 big_W = zeros(flip*num_images*num_eigenvecs);
-assert(isreal(All_X));
 
 for i = 1:num_images
     for i_flip = 1:flip
@@ -30,14 +29,14 @@ for i = 1:num_images
                     XtX = zeros(num_eigenvecs);
                     for z = 1:num_images
                         for z_flip = 1:flip
-                            XtX = XtX + weights(i,i_flip,z,z_flip)*(squeeze(All_X(i,i_flip,z,z_flip,:,:))'... 
-                                * squeeze(All_X(i,i_flip,z,z_flip,:,:))) + weights(z, z_flip,i, i_flip)*eye(num_eigenvecs);
+                            XtX = XtX + weights(i,i_flip,z,z_flip)*(All_X{i,i_flip,z,z_flip}'... 
+                                * All_X{i,i_flip,z,z_flip}) + weights(z, z_flip,i, i_flip)*eye(num_eigenvecs);
                         end
                     end
                     assert(isreal(XtX));
                     W_ij = XtX;
                 else
-                    W_ij = -weights(j,j_flip,i,i_flip) * squeeze(All_X(j,j_flip,i,i_flip,:,:)) -weights(i,i_flip,j,j_flip) * squeeze(All_X(i,i_flip,j, j_flip,:,:))';  
+                    W_ij = -weights(j,j_flip,i,i_flip) * All_X{j,j_flip,i,i_flip} -weights(i,i_flip,j,j_flip) * All_X{i,i_flip,j, j_flip}';  
                 end
                 big_W((flip*(i-1) + i_flip - 1)*num_eigenvecs + 1:(flip*(i-1) + i_flip)*num_eigenvecs, (flip*(j-1) + j_flip - 1) ... 
                     *num_eigenvecs + 1:(flip*(j-1) + j_flip )*num_eigenvecs) = W_ij;

@@ -34,7 +34,7 @@ for z = 1:num_images
         eig_vals1 = All_eig_vals{z,z_flip};
         for y = 1:num_images
             for y_flip = 1:flip       
-                if graph_weights(z, z_flip, y,y_flip) < 0.01
+                if graph_weights(z, z_flip, y,y_flip) < 0.0001
                     continue; % if no weight, don't update map
                 end
                 eig_vals2 = All_eig_vals{y,y_flip};
@@ -71,7 +71,7 @@ for z = 1:num_images
                 %weights = update_weights(X, sig, img1_projected_indicators, img2_projected_indicators, alphas);
                 % alphas = update_alpha(weights, lambda, X, img1_projected_indicators, img2_projected_indicators);
                 %===========================================================================          
-                All_func_maps(z,z_flip,y,y_flip,:,:) = X;
+                All_func_maps{z,z_flip,y,y_flip} = X;
                 Residuals(z,z_flip,y,y_flip) = residual;
           
             end

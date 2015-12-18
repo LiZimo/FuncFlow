@@ -11,9 +11,7 @@
 %% Copyright (c) 2015, Zimo Li
 %% All rights reserved.
 %% ====================================================================
-%
-%
-%
+
 addpath('./src'); 
 addpath(genpath('./external'));
 
@@ -35,7 +33,7 @@ end
 params.imgsize = 64; % the imgisze we rescale to when we run the algorithm.  
 params.image_dir_name = image_dir_name;
 params.images = images;
-params.num_eigenvecs = 64; % number of basis vectors to use
+params.num_eigenvecs = 80; % number of basis vectors to use
 params.flip = 0; % adds a flipped copy of every image into the network
 params.num_latent_vecs = 1; % number of latent basis vectors to use in alternating optimization.  Should be less than the dimension of the reduced space
 params.gbvs_weight = 100; % weight for the graph-based visual saliency correspondences
@@ -56,4 +54,8 @@ consistent_funcs = compute_consistentfunc_from_maps(funcflow_struct.funcmaps_fin
     visualize_output_masks(image_dir_name, consistent_funcs, funcflow_struct.eigvecs, params.imgsize, funcflow_struct.superpixels,[1 2 3 4 5]);
 [avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final); % final intersection over union score
 fprintf('avg IOU: %f \n', avg);
+% ================================================================
+%% Computing pair-wise optical flows from functional maps
+% only valid for pixel-basis
+[pairvx, pairvy, validpoints] = flow_from_functional_map(funcflow_struct.funcmaps_final, funcflow_struct.eigvecs, params.imgsize, params.imgsize);
 

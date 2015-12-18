@@ -20,16 +20,13 @@ flip, saliency_weight, graph_weights)
 
 num_eigenvecs = size(All_eig_vals{1,1}, 2);
 num_images = size(All_eig_vals, 1);
-All_func_maps = zeros(size(All_eig_vals,1),flip, size(All_eig_vals,1),flip, num_eigenvecs, num_eigenvecs);
+All_func_maps = cell(size(All_eig_vals,1),flip, size(All_eig_vals,1),flip); 
 Residuals = zeros(size(All_eig_vals,1),flip, size(All_eig_vals,1),flip);
 for z = 1:num_images
     for z_flip = 1:flip
         eig_vals1 = All_eig_vals{z, z_flip};
         for y = 1:num_images
-            for y_flip = 1:flip               
-                if graph_weights(z, z_flip, y,y_flip) < 0.01
-                    continue; % don't recompute map if there is no weight in image graph
-                end               
+            for y_flip = 1:flip                      
                 eig_vals2 = All_eig_vals{y,y_flip};
                 % ================================================
                 %% Load all constraints for the image pair
@@ -58,7 +55,7 @@ for z = 1:num_images
                 %weights = update_weights(X, sig, img1_projected_indicators, img2_projected_indicators, alphas);
                 % alphas = update_alpha(weights, lambda, X, img1_projected_indicators, img2_projected_indicators);
                 %===========================================================================          
-                All_func_maps(z,z_flip,y,y_flip,:,:) = X;
+                All_func_maps{z,z_flip,y,y_flip} = X;
                 Residuals(z,z_flip,y,y_flip) = residual;
             end
         end
