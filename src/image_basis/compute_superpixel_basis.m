@@ -50,6 +50,8 @@ assert(issymmetric(Laplacian_n));
 
 
 %% calculate eignvectors and values
-[eigenvectors, eigenvalues] = eigs(Laplacian_n, num_eigenvecs, 1e-10);
+opts.issym = 1;
+opts.isreal = 1;
+[eigenvectors, eigenvalues] = eigs(Laplacian_n, num_eigenvecs, 1e-10, opts);
 
 end

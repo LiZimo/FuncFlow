@@ -9,7 +9,7 @@ rmpath(genpath('../../external/dsp-code'));
 %% set parameters
 num_basis = 64; % # basis vectors to compute
 num_display = 10; % # basis vectors to display
-num_superpixels = 200;
+num_superpixels = 500;
 img = imread('../../data/iCoseg/icoseg/skate2/2116024165_5e4138ba98.jpg');
 ground_truth = imread('../../data/iCoseg/icoseg/skate2/GroundTruth/2116024165_5e4138ba98.png');
 
@@ -25,7 +25,7 @@ figure;
 colormap('hot');
 set(gcf,'name','Smallest Eigenvectors w/ intensity as Laplacian weight','numbertitle','off')
 
-subplot(2,num_basis,1:num_basis);
+subplot(2,num_display,1:num_display);
 out_im = img;
 out_im(lblImg ~= 0) = 0;
 imshow(out_im); % display original image broken into superpixels
@@ -34,15 +34,15 @@ imshow(out_im); % display original image broken into superpixels
 % ================================================================================================
 %% Display each basis element.
 
-for j = 1:num_display
+for j = 0:num_display - 1
     
-eig_vec = eigenvectors(:,j);
+eig_vec = eigenvectors(:,end - j);
 eig_vec = (eig_vec - min(eig_vec))/(max(eig_vec) - min(eig_vec));
 eig_vis = double(labels);
 for i = 1:length(eig_vec)
     eig_vis(eig_vis == i) = eig_vec(i);
 end
-ax = subplot(2,num_basis,j+num_basis);
+ax = subplot(2,num_display,j + 1 +num_display);
 imshow(eig_vis); colormap('hot');
 end
 

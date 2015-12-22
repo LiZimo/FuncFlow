@@ -14,7 +14,7 @@ image_name = '../../data/iCoseg/icoseg/skate2/2116024165_5e4138ba98.jpg';
 gt_name = '../../data/iCoseg/icoseg/skate2/GroundTruth/2116024165_5e4138ba98.png';
 img = imread(image_name);
 num_display_vecs = 5; % number of basis vectors to visualize
-num_basis_vecs = 64; % how many basis vectors to compute
+num_basis_vecs = 32; % how many basis vectors to compute
 Laplacian_radius = 5; % radius for laplacian n-cut
 imgsize = 64; % reshape image to square of this size
 img1 = double(imresize(img, [imgsize, imgsize]));
@@ -27,20 +27,22 @@ all_diffs = pdist2(intnsty(:), intnsty(:));
 sigmav = sqrt(median(all_diffs(:))); % sigmav the median of all intensity value differences
 
 [laplcn, D_half] = ICS_laplacian_nf(img1,Laplacian_radius,sigmax, sigmav);
-[eig_vecs, eig_vals] = eigs(laplcn, num_basis_vecs, 1e-20);
+opts.issym = 1;
+opts.isreal = 1;
+[eig_vecs, eig_vals] = eigs(laplcn, num_basis_vecs, 1e-20, opts);
 
 % =========================================================================
 %% Visualize each basis element
 figure;
 set(gcf,'name','Smallest Eigenvectors of Laplacian','numbertitle','off')
-subplot(2,num_basis_vecs, 1:num_basis_vecs);
+subplot(2,num_display_vecs, 1:num_display_vecs);
 imshow(img);
-for i = 1:num_display_vecs
+for i = 0:num_display_vecs - 1
     
-    eig_vec = eig_vecs(:,i);
+    eig_vec = eig_vecs(:,end - i);
     eig_vec = (eig_vec - min(eig_vec))/(max(eig_vec) - min(eig_vec)); % scale image to be in [0,1]
     eig_vec = reshape(eig_vec, [imgsize imgsize]);
-    subplot(2,num_basis_vecs, i + num_basis_vecs);
+    subplot(2,num_display_vecs, i + 1 + num_display_vecs);
     imshow(eig_vec); colormap('hot');
     
 end
@@ -49,7 +51,7 @@ end
 
 gt_seg = imread(gt_name);
 
-proj = get_projected_image(eig_vecs(:,1:64), imresize(gt_seg, [imgsize imgsize])); % project image into the basis
+proj = get_projected_image(eig_vecs(:,1:num_basis_vecs), imresize(gt_seg, [imgsize imgsize])); % project image into the basis
 proj = imresize(proj, [size(img,1) size(img,2)], 'bilinear');
 proj = reshape(proj, 1, []);
 [id, c] = kmeans(proj',2); % use kmeans to threshold the image into binary
