@@ -17,7 +17,7 @@ addpath(genpath('./external'));
 
 %% setting up parameter values
 params = struct;
-image_dir_name = 'data/iCoseg/icoseg/Christ';
+image_dir_name = 'data/iCoseg/icoseg/skate2';
 images = dir([image_dir_name '/*.jpg']);
 if isempty(images)
     images = dir([image_dir_name '/*.bmp']);
