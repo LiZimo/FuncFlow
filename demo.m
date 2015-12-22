@@ -12,12 +12,12 @@
 %% All rights reserved.
 %% ====================================================================
 
-addpath('./src'); 
+addpath(genpath('./src')); 
 addpath(genpath('./external'));
 
 %% setting up parameter values
 params = struct;
-image_dir_name = 'data/iCoseg/icoseg/skate2';
+image_dir_name = 'data/iCoseg/icoseg/Christ';
 images = dir([image_dir_name '/*.jpg']);
 if isempty(images)
     images = dir([image_dir_name '/*.bmp']);
@@ -54,8 +54,3 @@ consistent_funcs = compute_consistentfunc_from_maps(funcflow_struct.funcmaps_fin
     visualize_output_masks(image_dir_name, consistent_funcs, funcflow_struct.eigvecs, params.imgsize, funcflow_struct.superpixels,[1 2 3 4 5]);
 [avg, IOUs] = compute_IOUs(image_dir_name, output_masks_final); % final intersection over union score
 fprintf('avg IOU: %f \n', avg);
-% ================================================================
-%% Computing pair-wise optical flows from functional maps
-% only valid for pixel-basis
-[pairvx, pairvy, validpoints] = flow_from_functional_map(funcflow_struct.funcmaps_final, funcflow_struct.eigvecs, params.imgsize, params.imgsize);
-

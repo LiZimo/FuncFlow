@@ -51,7 +51,7 @@ for i = 1:length(images)
     end
     % ===========================================
     
-    consistent_func_im = seg_kmeans(consistent_func_im); % eliminate the background using kmeans on the heatmap values
+    consistent_func_im = remove_bg(consistent_func_im); % eliminate the background using kmeans on the heatmap values
     
     if ~iscell(superpixels)
         % if we are in the pixel basis, we must reshape and rescale

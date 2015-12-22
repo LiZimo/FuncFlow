@@ -27,6 +27,7 @@ function funcflow_struct = run_funcflow(params)
 % funcflow_struct.funcmap_constraints - (N x F x N x F cell, N is #images, F is flip) contains the correspondences between each image-pair projected into reduced space
 % funcflow_struct.superpixels - (N x 1 struct) contains superpixel labels for all the images
 % funcflow_struct.latent_bases -  (M*N*F x V double, M is number of basisvectors, N is number of images, F is flip (either 0 or 1), V is number oflatent vectors) all latent bases
+% funcflow_struct.optical_flow - (struct) contains all the data for the final derived optical flow fields from the functional maps.  See flow_from_functional_map.m for details
 %% ===============================================
 %% Initializing weights
 weights = init_weights(params.image_dir_name, params.flip+1);
@@ -63,6 +64,11 @@ initweights = weights; % save initial weights
      weights = weights_from_residuals(Residuals); % updating the weights of the image graph based on Residuals of the functional maps
      fprintf('Finished Iteration %d \n', iters);
  end
+ 
+ % ================================================================
+%% Computing pair-wise optical flows from functional maps
+% only valid for pixel-basis
+optical_flow = flow_from_functional_map(All_func_maps, All_eig_vecs, params.imgsize, params.imgsize);
 % ==========================================================================
  %% Save results
 funcflow_struct = struct;
@@ -75,6 +81,7 @@ funcflow_struct.weights_final = weights;
 funcflow_struct.funcmap_constraints = All_constraints;
 funcflow_struct.superpixels = All_superpixels;
 funcflow_struct.latent_bases = latent_bases;
+funcflow_struct.optical_flow = optical_flow;
 % ==========================================================================
 end
  

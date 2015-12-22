@@ -54,3 +54,13 @@ binary masks of every photo, with the same name.
 
 There are a number of parameters with explanations in the demo.m file 
 that can be modified.
+
+
+==============================================
+Additional Tools:
+==============================================
+
+There are a number of scripts in "funcflow/src/visualizations" that are not
+used in the pipeline, but which produce figures of intermediary steps
+that might be of interest (such as some of the ones produced in the pdf).  
+
