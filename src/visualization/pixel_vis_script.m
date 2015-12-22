@@ -30,6 +30,9 @@ sigmav = sqrt(median(all_diffs(:))); % sigmav the median of all intensity value 
 opts.issym = 1;
 opts.isreal = 1;
 [eig_vecs, eig_vals] = eigs(laplcn, num_basis_vecs, 1e-20, opts);
+[vals,sorted_eig_val_indices] = sort(diag(eig_vals));
+eig_vals = diag(vals);
+eig_vecs = eig_vecs(:,sorted_eig_val_indices);
 
 % =========================================================================
 %% Visualize each basis element
@@ -37,12 +40,12 @@ figure;
 set(gcf,'name','Smallest Eigenvectors of Laplacian','numbertitle','off')
 subplot(2,num_display_vecs, 1:num_display_vecs);
 imshow(img);
-for i = 0:num_display_vecs - 1
+for i = 1:num_display_vecs
     
-    eig_vec = eig_vecs(:,end - i);
+    eig_vec = eig_vecs(:,i);
     eig_vec = (eig_vec - min(eig_vec))/(max(eig_vec) - min(eig_vec)); % scale image to be in [0,1]
     eig_vec = reshape(eig_vec, [imgsize imgsize]);
-    subplot(2,num_display_vecs, i + 1 + num_display_vecs);
+    subplot(2,num_display_vecs, i + num_display_vecs);
     imshow(eig_vec); colormap('hot');
     
 end

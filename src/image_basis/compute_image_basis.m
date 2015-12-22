@@ -61,6 +61,10 @@ for z = 1:length(images)
             opts.issym = 1;
             opts.isreal = 1;
             [eig_vecs, eig_vals] = eigs(laplcn, num_eigenvecs, 1e-10,opts);
+            [vals,sorted_eig_val_indices] = sort(diag(eig_vals));
+            eig_vals = diag(vals);
+            eig_vecs = eig_vecs(:,sorted_eig_val_indices);
+
             % =================================================
             %% All_superpixels is set to 0 if using pixels
             All_superpixels= 0;       

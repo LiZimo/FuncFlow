@@ -49,9 +49,12 @@ Laplacian_n = (Laplacian_n + Laplacian_n')/2;
 assert(issymmetric(Laplacian_n));
 
 
-%% calculate eignvectors and values
+%% calculate eignvectors and values and sort them
 opts.issym = 1;
 opts.isreal = 1;
 [eigenvectors, eigenvalues] = eigs(Laplacian_n, num_eigenvecs, 1e-10, opts);
+[vals, sorted_eigenvalue_indices] = sort(diag(eigenvalues));
+eigenvalues = diag(vals);
+eigenvectors = eigenvectors(:,sorted_eigenvalue_indices);
 
 end

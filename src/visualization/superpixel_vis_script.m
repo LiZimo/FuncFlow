@@ -16,6 +16,9 @@ ground_truth = imread('../../data/iCoseg/icoseg/skate2/GroundTruth/2116024165_5e
 % =============================================================================================
 %% Compute superpixel basis and calculate borders of superpixels for the figure
 [Laplacian_n, labels, eigenvectors, eigenvalues] = compute_superpixel_basis(img, num_superpixels, num_basis);
+[vals, sorted_eigenvalue_indices] = sort(diag(eigenvalues));
+eigenvalues = diag(vals);
+eigenvectors = eigenvectors(:,sorted_eigenvalue_indices);
 [gx,gy] = gradient(double(labels));
 lblImg = double(labels);
 lblImg((gx.^2+gy.^2)==0) = 0;
@@ -34,15 +37,15 @@ imshow(out_im); % display original image broken into superpixels
 % ================================================================================================
 %% Display each basis element.
 
-for j = 0:num_display - 1
+for j = 1:num_display 
     
-eig_vec = eigenvectors(:,end - j);
+eig_vec = eigenvectors(:,j);
 eig_vec = (eig_vec - min(eig_vec))/(max(eig_vec) - min(eig_vec));
 eig_vis = double(labels);
 for i = 1:length(eig_vec)
     eig_vis(eig_vis == i) = eig_vec(i);
 end
-ax = subplot(2,num_display,j + 1 +num_display);
+ax = subplot(2,num_display,j +num_display);
 imshow(eig_vis); colormap('hot');
 end
 
