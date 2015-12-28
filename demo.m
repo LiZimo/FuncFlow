@@ -41,7 +41,7 @@ params.num_nn = 0; % number of nearest-gist neighbors to use in image-graph; if 
 params.laplacian_radius = 5; % pixel radius to compute basis
 params.correspondence_type = 'SIFTflow'; % the other option here is 'DSP'.  
 params.domain = 'pixel'; % either 'pixel' or 'superpixel'.  pixel works better in my experience, but both follow the same principle.
-params.num_superpix = 80; % number of superpixels to use if using superpixels.  Should not be greater than sqrt(total number of pixels).
+params.num_superpix = 64; % number of superpixels to use if using superpixels.  Should not be greater than sqrt(total number of pixels).
 %=================================================================
 %% run funcflow on the image directory
 funcflow_struct = run_funcflow(params);

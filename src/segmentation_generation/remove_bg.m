@@ -27,7 +27,7 @@ end
 refined_heatmap(id == minvar_id) = 0;
 %===============================================================
 %% Convolve to smooth it out a little
-filter = [1/sqrt(2) 1 1/sqrt(2); 1 0 1; 1/sqrt(2) 1 1/sqrt(2)];
+filter = [1/sqrt(2) 1 1/sqrt(2); 1 2 1; 1/sqrt(2) 1 1/sqrt(2)];
 for c = 1:2
     refined_heatmap = conv2(refined_heatmap, filter, 'same');
 end

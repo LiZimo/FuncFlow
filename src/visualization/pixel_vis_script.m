@@ -4,9 +4,9 @@
 
 % These are the basis vectors we use in the optimization of
 % the functional maps.  To run the script on a different image, specify
-% a new image_name and gt_name.  
+% a new image_name and gt_name.
 % =========================================================================
-addpath(genpath('../../src')); 
+addpath(genpath('../../src'));
 addpath(genpath('../../external'));
 rmpath(genpath('../../external/dsp-code'));
 %% Set Parameters
@@ -26,11 +26,23 @@ intnsty = sum(img1.^2,3).^(0.5);
 all_diffs = pdist2(intnsty(:), intnsty(:));
 sigmav = sqrt(median(all_diffs(:))); % sigmav the median of all intensity value differences
 
-[laplcn, D_half] = ICS_laplacian_nf(img1,Laplacian_radius,sigmax, sigmav);
+
+
+[laplcn_img, D_half] = ICS_laplacian_nf(img1, Laplacian_radius, sigmax, sigmav);
+[laplcn_logical, ~] = ICS_laplacian_nf(zeros(imgsize), 1, 1, 1);
+%==================================================
+%% compute the smallest eigenvectors of the laplcn
+%% This is the reduced functional space we will be optimizing in
 opts.issym = 1;
 opts.isreal = 1;
-[eig_vecs, eig_vals] = eigs(laplcn, num_basis_vecs, 1e-20, opts);
+[eig_vecs_img, eig_vals_img] = eigs(laplcn_img, num_basis_vecs, 1e-10,opts);
+[eig_vecs_logical, eig_vals_logical] = eigs(laplcn_logical, num_basis_vecs, 1e-10, opts);
+eig_vals = diag([diag(eig_vals_img); diag(eig_vals_logical)]);
+eig_vecs = [eig_vecs_img eig_vecs_logical];
+
 [vals,sorted_eig_val_indices] = sort(diag(eig_vals));
+
+
 eig_vals = diag(vals);
 eig_vecs = eig_vecs(:,sorted_eig_val_indices);
 
@@ -69,7 +81,7 @@ intersection = gt_seg(:,:,1) .* proj_thresh; % compute the projection error here
 union = logical(gt_seg(:,:,1) + proj_thresh);
 error = 1 - sum(intersection(:))/sum(union(:));
 
-figure; 
+figure;
 str=sprintf('Final Projection Error after Thresholding: %f', error);
-subplot(3,1,1); imshow(gt_seg); title('Ground-Truth segmentation'); colormap('hot'); 
+subplot(3,1,1); imshow(gt_seg); title('Ground-Truth segmentation'); colormap('hot');
 subplot(3,1,2); imshow(proj); title('Projected into basis'); colormap('hot'); subplot(3,1,3); imshow(proj_thresh); title(str); colormap('hot');
