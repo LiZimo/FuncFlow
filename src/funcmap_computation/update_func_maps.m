@@ -34,7 +34,7 @@ for z = 1:num_images
         eig_vals1 = All_eig_vals{z,z_flip};
         for y = 1:num_images
             for y_flip = 1:flip       
-                if graph_weights(z, z_flip, y,y_flip) < 0.0001
+                if graph_weights(z, z_flip, y,y_flip) == 0
                     continue; % if no weight, don't update map
                 end
                 eig_vals2 = All_eig_vals{y,y_flip};

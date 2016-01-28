@@ -28,6 +28,7 @@ superpixels = labels;
 % ================================================================
 adj_mat_boundary = adj_from_superpixels(labels, 'boundary');
 adj_mat_intensity = adj_from_superpixels(labels, 'intensity', img);
+adj_mat_logical = adj_from_superpixels(labels, 'logical', img);
 sigma_bnd = median(adj_mat_boundary(adj_mat_boundary~=0)); %% sigma vales are the medians of the non zero values of these two adjacency matrices
 sigma_intns = median(adj_mat_intensity(adj_mat_intensity~=0));
 
@@ -39,7 +40,7 @@ adj_mat_intns_exp = exp(-adj_mat_intensity/sigma_intns);
 adj_mat_intns_exp(adj_mat_intensity == 0) = 0;
 adj_mat_whole = adj_mat_intns_exp;  % use just average intensity laplacian in the end
 
-%========Calculate normalized laplacian from the adjacency============================================
+%========Calculate normalized laplacian from the intensity adjacency============================================
 Diagonal = diag(sum(adj_mat_whole));
 d = diag(Diagonal);
 D_neghalf = diag(1./sqrt(d));
@@ -47,12 +48,25 @@ Laplacian = Diagonal - adj_mat_whole;
 Laplacian_n = D_neghalf * Laplacian * D_neghalf;
 Laplacian_n = (Laplacian_n + Laplacian_n')/2;
 assert(issymmetric(Laplacian_n));
+% =======Calc normalized laplacian from logical adjacency==========
+Diagonal_logical = diag(sum(adj_mat_boundary));
+d_logical = diag(Diagonal_logical);
+D_neghalf_logical = diag(1./sqrt(d_logical));
+Laplacian_logical = Diagonal - adj_mat_whole;
+Laplacian_logical_n = D_neghalf_logical * Laplacian_logical * D_neghalf_logical;
+Laplacian_logical_n = (Laplacian_logical_n + Laplacian_logical_n')/2;
+assert(issymmetric(Laplacian_logical_n));
 
 
 %% calculate eignvectors and values and sort them
 opts.issym = 1;
 opts.isreal = 1;
-[eigenvectors, eigenvalues] = eigs(Laplacian_n, num_eigenvecs, 1e-10, opts);
+[eig_vecs_log, eig_vals_log] = eigs(Laplacian_logical_n, num_eigenvecs, 1e-10, opts);
+[eig_vecs_intns, eig_vals_intns] = eigs(Laplacian_n, num_eigenvecs, 1e-10, opts);
+
+eigenvalues = diag([diag(eig_vals_log); diag(eig_vals_intns)]);
+eigenvectors = [eig_vecs_log eig_vecs_intns];
+
 [vals, sorted_eigenvalue_indices] = sort(diag(eigenvalues));
 eigenvalues = diag(vals);
 eigenvectors = eigenvectors(:,sorted_eigenvalue_indices);

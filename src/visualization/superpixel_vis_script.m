@@ -7,7 +7,7 @@ addpath(genpath('../../src'));
 addpath(genpath('../../external'));
 rmpath(genpath('../../external/dsp-code'));
 %% set parameters
-num_basis = 64; % # basis vectors to compute
+num_basis = 32; % # basis vectors to compute
 num_display = 10; % # basis vectors to display
 num_superpixels = 500;
 img = imread('../../data/iCoseg/icoseg/skate2/2116024165_5e4138ba98.jpg');

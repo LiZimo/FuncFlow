@@ -48,7 +48,7 @@ for i = 1:num_images
 end
 symtest = (big_W + big_W')/2 - big_W;
 assert(isreal(big_W));
-assert(norm(symtest) < 0.01);
+%assert(norm(symtest) < 0.01);
 
 symmed_w = (big_W + big_W')/2;
 [Y, eig_vals] = eigs(symmed_w, 10, 1e-20);

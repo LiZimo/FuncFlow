@@ -75,10 +75,10 @@ end
 %% generate figure here if so desired
 
     for j = 1:length(which)
-        image = imread([image_dir_name '/' images(j).name]);
+        image = imread([image_dir_name '/' images(which(j)).name]);
         segmented_image_final = mask_to_segment(output_masks_final{which(j)}, image);
         segmented_image_rough = mask_to_segment(output_masks_rough{which(j)}, image); 
-        subplot(3, length(which), 0*length(which) + j); imshow(output_consistentfunc{j}); colormap('hot'); title('Generated Function', 'FontSize', 7);
+        subplot(3, length(which), 0*length(which) + j); imshow(output_consistentfunc{which(j)}); colormap('hot'); title('Generated Function', 'FontSize', 7);
         subplot(3, length(which), 1*length(which) + j) ; imshow(segmented_image_rough); title('Rough Thresholding', 'FontSize', 7);
         subplot(3, length(which), 2*length(which) + j); imshow(segmented_image_final); title('Final Output', 'FontSize', 7); 
     end

@@ -30,11 +30,11 @@ function funcflow_struct = run_funcflow(params)
 % funcflow_struct.optical_flow - (struct) contains all the data for the final derived optical flow fields from the functional maps.  See flow_from_functional_map.m for details
 %% ===============================================
 %% Initializing weights
-weights = init_weights(params.image_dir_name, params.flip+1);
+graph_weights = init_weights(params.image_dir_name, params.flip+1);
 if params.num_nn > 0
-    weights = init_graph_gist_nn(params.image_dir_name, params.imgsize, params.num_nn, params.flip+1); 
+    graph_weights = init_graph_gist_nn(params.image_dir_name, params.imgsize, params.num_nn, params.flip+1);
 end
-initweights = weights; % save initial weights
+initweights = graph_weights; % save initial weights
 %===========================================================================
 %% Initializing f-maps
  tic;
@@ -44,10 +44,10 @@ initweights = weights; % save initial weights
  
  fprintf('Computing constraints \n');
  [All_constraints] = compute_funcmap_constraints(params.image_dir_name, params.imgsize,  ...
-     params.flip + 1, All_eig_vecs, All_superpixels, params.correspondence_type);
+     params.flip + 1, All_eig_vecs, All_superpixels, graph_weights, params.correspondence_type, params.caffe_dir);
  
  fprintf('Initializing Functional Maps \n');
- [All_func_maps, Residuals] = initialize_func_maps( All_eig_vals, All_constraints,params.flip+1, params.gbvs_weight, weights);
+ [All_func_maps, Residuals] = initialize_func_maps( All_eig_vals, All_constraints,params.flip+1, params.gbvs_weight, graph_weights);
  
 
  All_func_maps_start = All_func_maps; % save the funcmap initialization
@@ -58,10 +58,10 @@ initweights = weights; % save initial weights
  fprintf('alternating between Latent Basis and F-map computation \n ');
  for iters = 1:5
      latent_constraint = 1000;
-     [latent_bases, big_W] = compute_latent_basis(All_func_maps, weights, params.num_latent_vecs);
+     [latent_bases, big_W] = compute_latent_basis(All_func_maps, graph_weights, params.num_latent_vecs);
      [All_func_maps, Residuals] = update_func_maps(All_eig_vals, All_constraints, latent_bases, ...
-         latent_constraint,params.flip+1, Residuals, All_func_maps, params.gbvs_weight, weights);
-     weights = weights_from_residuals(Residuals); % updating the weights of the image graph based on Residuals of the functional maps
+         latent_constraint,params.flip+1, Residuals, All_func_maps, params.gbvs_weight, graph_weights);
+     graph_weights = weights_from_residuals(Residuals, graph_weights); % updating the weights of the image graph based on Residuals of the functional maps
      fprintf('Finished Iteration %d \n', iters);
  end
  
@@ -77,7 +77,7 @@ funcflow_struct.funcmaps_final = All_func_maps;
 funcflow_struct.eigvecs = All_eig_vecs;
 funcflow_struct.eigvals = All_eig_vals;
 funcflow_struct.weights_init = initweights;
-funcflow_struct.weights_final = weights;
+funcflow_struct.weights_final = graph_weights;
 funcflow_struct.funcmap_constraints = All_constraints;
 funcflow_struct.superpixels = All_superpixels;
 funcflow_struct.latent_bases = latent_bases;

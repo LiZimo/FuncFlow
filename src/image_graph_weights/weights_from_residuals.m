@@ -1,4 +1,4 @@
-function weights = weights_from_residuals(Residuals)
+function weights = weights_from_residuals(Residuals, prev_weights)
 %% ==========================================
 %% Compute weights from the residuals of the functional maps
 % images and their flips are given a weight of 1
@@ -13,12 +13,20 @@ function weights = weights_from_residuals(Residuals)
 
 num_ims = size(Residuals,1);
 flip = size(Residuals,2);
-weights = exp(-Residuals/(median(Residuals(:))^2));
+weights = exp(-Residuals/(median(Residuals(Residuals ~= 0))^2));
+
 for k = 1:num_ims
-    for flips = 1:flip
-        weights(k,flips,k,flips) = 0;
-        weights(k,flips,k,flips) = 0;
-        weights(k,flips,k,mod(flips,2) + 1) = 1;
-        weights(k,mod(flips,2) + 1, k, flips) = 1;
+    weights(k,1,k,1) = 0;
+end
+
+if flip == 2
+    for j = 1:num_ims
+        weights(j,1,j,2) = 1;
+        weights(j,2,j,1) = 1;
+        weights(k,2,k,2) = 0;
     end
+end
+
+weights(prev_weights == 0) = 0;
+
 end

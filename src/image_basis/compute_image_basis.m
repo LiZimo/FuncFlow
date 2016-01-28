@@ -34,6 +34,14 @@ end
 All_eig_vecs = cell(length(images),flip);
 All_eig_vals = cell(length(images),flip);
 All_superpixels = cell(length(images), flip);
+
+
+% We use both the eigenvectors of the logical laplacian, and the image
+% laplacian, in the optimization
+opts.issym = 1;
+opts.isreal = 1;
+[laplcn_logical_pix, ~] = ICS_laplacian_nf(zeros(imgsize), 1, 1, 1);
+[eig_vecs_logical, eig_vals_logical] = eigs(laplcn_logical_pix, num_eigenvecs, 1e-10, opts);
 for z = 1:length(images)
     
     for z_flip = 1:flip
@@ -55,14 +63,13 @@ for z = 1:length(images)
             %==================================================
             %% calculate the laplacian of the image here
             [laplcn_img, D_half] = ICS_laplacian_nf(im1, radius, sigmax, sigmav);
-            [laplcn_logical, ~] = ICS_laplacian_nf(zeros(imgsize), 1, 1, 1);
+            
             %==================================================
             %% compute the smallest eigenvectors of the laplcn
             %% This is the reduced functional space we will be optimizing in
-            opts.issym = 1;
-            opts.isreal = 1;
+
             [eig_vecs_img, eig_vals_img] = eigs(laplcn_img, num_eigenvecs, 1e-10,opts);
-            [eig_vecs_logical, eig_vals_logical] = eigs(laplcn_logical, num_eigenvecs, 1e-10, opts);
+            
             eig_vals = diag([diag(eig_vals_img); diag(eig_vals_logical)]);
             eig_vecs = [eig_vecs_img eig_vecs_logical];
             

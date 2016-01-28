@@ -40,6 +40,9 @@ opts.isreal = 1;
 eig_vals = diag([diag(eig_vals_img); diag(eig_vals_logical)]);
 eig_vecs = [eig_vecs_img eig_vecs_logical];
 
+% eig_vals = eig_vals_logical;
+% eig_vecs = eig_vecs_logical;
+
 [vals,sorted_eig_val_indices] = sort(diag(eig_vals));
 
 

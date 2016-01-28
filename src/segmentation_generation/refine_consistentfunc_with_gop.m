@@ -16,7 +16,7 @@ init_gop;
 gop_mex( 'setDetector', 'MultiScaleStructuredForest("/home/zimo/Documents/dense_functional_map_matching/external/gop_1.3/data/sf.dat")' );
 
  p = Proposal('max_iou', 1.0,...
-             'unary', 5, 8, 'seedUnary()', 'backgroundUnary({0,15})',...
+             'unary', 5, 3, 'seedUnary()', 'backgroundUnary({0,15})',...
              'unary', 0, 10, 'zeroUnary()', 'backgroundUnary({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})' ...
              );
 
@@ -29,7 +29,8 @@ gop_mex( 'setDetector', 'MultiScaleStructuredForest("/home/zimo/Documents/dense_
      for i=1:size(props,1)
         mask = props(i,:);
         m = double(uint8(mask( os.s()+1 )));
-        intersection_seg = sum(sum(m .* input_mask))^2 / sum(sum(logical(m .* input_mask))*mean_input);
+        %intersection_seg = sum(sum(m .* input_mask))^2 / sum(sum(logical(m .* input_mask))*mean_input);
+        intersection_seg = sum(sum(m .* input_mask))^2;
         union_seg = sum(sum(logical(m + input_mask)));
         IOUs_seg(i) = intersection_seg/union_seg;
      end
@@ -38,7 +39,7 @@ IOUs(isnan(IOUs)) = 0;
 
 %=================================================
 %% Find the top k proposals given their RIOU scores
-k = 3;
+k = 1;
 [~, ids] = sort(IOUs);
 top_k = ids(end-k + 1:end);
 top_props = cell(k,1);

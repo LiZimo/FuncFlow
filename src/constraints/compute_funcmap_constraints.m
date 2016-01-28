@@ -1,4 +1,4 @@
-function [All_constraints] = compute_funcmap_constraints(image_dir_name, imgsize,flip, All_eig_vecs, All_superpixels, type)
+function [All_constraints, All_feats] = compute_funcmap_constraints(image_dir_name, imgsize,flip, All_eig_vecs, All_superpixels, graph_weights, type, caffe_dir)
 %% ======================================================
 %% Compute all constraints, projected into reduced space of every image pair
 % The correspondences used are both pixel-correspondences from optical flow
@@ -30,6 +30,7 @@ if isempty(images)
 end
 
 All_constraints = cell(length(images), flip, length(images), flip,2);
+All_feats = cell(length(images), flip);
 for z = 1:length(images)
     
     for z_flip = 1:flip
@@ -47,6 +48,10 @@ for z = 1:length(images)
         
         for y = 1:length(images)
             for y_flip = 1:flip
+                if graph_weights(z, z_flip, y,y_flip) == 0
+                    continue; % if no weight, don't update map
+                end
+                
                 if y_flip == 1
                     im2_whole = imread([image_dir_name '/' images(y).name]);
                 elseif y_flip ==2
@@ -61,8 +66,10 @@ for z = 1:length(images)
                 %% Calculate all correspondences between the two images
                 if z == y && z_flip ~= y_flip
                     [C,D] = get_flip_correspondences(im1); % gt-correspondences between an image and its flipped version
-                else                   
-                   [C, D] = get_pixel_correspondences(im1, im2, type); % pixel correspondences using either 'SIFTflow' or 'DSP'
+                else     
+                   [C, D, im1_feats, im2_feats] = get_pixel_correspondences(im1, im2, type, caffe_dir, 'sift', All_feats{z, z_flip}, All_feats{y, y_flip}); % pixel correspondences using either 'SIFTflow' or 'DSP'
+                   All_feats{z, z_flip} = im1_feats;
+                   All_feats{y, y_flip} = im2_feats;
                 end
                 
                 [im1_saliency, im2_saliency] = get_saliency_correspondences(im1, im2); %Saliency correspondences using 'GBVS'

@@ -26,7 +26,15 @@ for z = 1:num_images
     for z_flip = 1:flip
         eig_vals1 = All_eig_vals{z, z_flip};
         for y = 1:num_images
-            for y_flip = 1:flip                      
+            for y_flip = 1:flip
+                if graph_weights(z, z_flip, y,y_flip) == 0
+                    if z ==y && z_flip == y_flip
+                        All_func_maps{z, z_flip, y, y_flip} = eye(num_eigenvecs);
+                    else
+                    All_func_maps{z, z_flip, y, y_flip} = zeros(num_eigenvecs); % if no weight, don't update map
+                    end
+                    continue;
+                end
                 eig_vals2 = All_eig_vals{y,y_flip};
                 % ================================================
                 %% Load all constraints for the image pair
