@@ -10,7 +10,7 @@ function features = compute_caffenet_features(im, layer, caffe_dir)
 % features - features array, the same height and width as input image
 %% =========================================================
 
-
+warning('off', 'all');
 addpath(genpath(caffe_dir));
 % Set caffe mode
 if exist('use_gpu', 'var') && use_gpu

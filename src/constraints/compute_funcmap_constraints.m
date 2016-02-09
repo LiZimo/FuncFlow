@@ -1,4 +1,4 @@
-function [All_constraints, All_feats] = compute_funcmap_constraints(image_dir_name, imgsize,flip, All_eig_vecs, All_superpixels, graph_weights, type, caffe_dir)
+function [All_constraints, All_feats] = compute_funcmap_constraints(image_dir_name, imgsize,flip, All_eig_vecs, All_superpixels, graph_weights, opt_flow_alg, feat_type, caffe_dir)
 %% ======================================================
 %% Compute all constraints, projected into reduced space of every image pair
 % The correspondences used are both pixel-correspondences from optical flow
@@ -31,7 +31,26 @@ end
 
 All_constraints = cell(length(images), flip, length(images), flip,2);
 All_feats = cell(length(images), flip);
-for z = 1:length(images)
+
+
+parfor f = 1:length(images)
+    for f_flip = 1:flip
+        if f_flip == 1
+            im = imread([image_dir_name '/' images(f).name]);
+        elseif f_flip == 2 
+            im = flip_image(imread([image_dir_name '/' images(f).name])); % use flipped copy
+        end
+        
+        im = double(imresize(im, [imgsize imgsize]));
+        
+        im_f_feats = get_pix_features(im, feat_type, caffe_dir);
+        All_feats{f, f_flip} = im_f_feats;
+    end
+end
+
+
+
+parfor z = 1:length(images)
     
     for z_flip = 1:flip
         if z_flip == 1
@@ -39,6 +58,8 @@ for z = 1:length(images)
         elseif z_flip == 2 
             im1_whole = flip_image(imread([image_dir_name '/' images(z).name])); % use flipped copy
         end
+        
+        All_constraints_z = cell(length(images), flip,2);
         
         % =============================
         %% resize image 1 and load basis
@@ -66,10 +87,9 @@ for z = 1:length(images)
                 %% Calculate all correspondences between the two images
                 if z == y && z_flip ~= y_flip
                     [C,D] = get_flip_correspondences(im1); % gt-correspondences between an image and its flipped version
-                else     
-                   [C, D, im1_feats, im2_feats] = get_pixel_correspondences(im1, im2, type, caffe_dir, 'sift', All_feats{z, z_flip}, All_feats{y, y_flip}); % pixel correspondences using either 'SIFTflow' or 'DSP'
-                   All_feats{z, z_flip} = im1_feats;
-                   All_feats{y, y_flip} = im2_feats;
+                else
+                   [C, D, ~, ~] = get_pixel_correspondences(im1, im2, opt_flow_alg, caffe_dir, feat_type, All_feats{z, z_flip}, All_feats{y, y_flip}); % pixel correspondences using either 'SIFTflow' or 'DSP'
+                   
                 end
                 
                 [im1_saliency, im2_saliency] = get_saliency_correspondences(im1, im2); %Saliency correspondences using 'GBVS'
@@ -89,13 +109,16 @@ for z = 1:length(images)
                 indicators{1} = img1_projected_indicators;
                 indicators{2} = img2_projected_indicators;
                 for j = 1:2
-                    All_constraints{z, z_flip, y, y_flip,j} = indicators{j};
+                    All_constraints_z{y, y_flip,j} = indicators{j};
                     
                 end
+                fprintf('Finished constraint pair in %d \n', z);
                 %==============================================================================================
             end
         end
         
+        All_constraints(z, z_flip, :,:,:) = All_constraints_z;
+
     end
     fprintf('Finished computing constraints for image (%d / %d) \n', z, length(images));
 end

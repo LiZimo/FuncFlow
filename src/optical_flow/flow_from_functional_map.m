@@ -20,7 +20,7 @@ pairvy = cell(num_images, num_images);
 validpoints = cell(num_images, num_images);
 avg_deviations = zeros(num_images);
 
-for i = 1:num_images
+parfor i = 1:num_images
     for j = 1:num_images
         funcmap = All_func_maps{i,1,j,1};
         basis1 = All_eig_vecs{i,1};

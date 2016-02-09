@@ -15,6 +15,9 @@ function funcflow_struct = run_funcflow(params)
 % params.laplacian_radius - (int) pixel radius to compute basis
 % params.correspondences - (str) 'SIFTflow' or 'DSP' correspondences.  
 % params.domain - (str) 'pixel' or 'superpixel' domain for basis
+% params.feat_type - (str) either 'sift', 'conv4', or a double representing a weighted combination of both feature types; for flow-field computation
+% params.caffe_dir = '/home/zimo/Documents/caffe-master'; % the caffe directory on local machine if you want to use caffenet features to compute correspondences
+% params.nn_feat_type = 'caffenet'; % either 'caffenet' or 'gist' for which features to use when connecting image graph nearest neighbors
 % ===============================================
 %% OUTPUTS
 % funcflow_struct - (struct) ...
@@ -32,7 +35,7 @@ function funcflow_struct = run_funcflow(params)
 %% Initializing weights
 graph_weights = init_weights(params.image_dir_name, params.flip+1);
 if params.num_nn > 0
-    graph_weights = init_graph_gist_nn(params.image_dir_name, params.imgsize, params.num_nn, params.flip+1);
+    graph_weights = init_graph_nn(params.image_dir_name, params.imgsize, params.num_nn, params.flip+1, params.nn_feat_type, params.caffe_dir);
 end
 initweights = graph_weights; % save initial weights
 %===========================================================================
@@ -44,7 +47,7 @@ initweights = graph_weights; % save initial weights
  
  fprintf('Computing constraints \n');
  [All_constraints] = compute_funcmap_constraints(params.image_dir_name, params.imgsize,  ...
-     params.flip + 1, All_eig_vecs, All_superpixels, graph_weights, params.correspondence_type, params.caffe_dir);
+     params.flip + 1, All_eig_vecs, All_superpixels, graph_weights, params.correspondence_type, params.feat_type, params.caffe_dir);
  
  fprintf('Initializing Functional Maps \n');
  [All_func_maps, Residuals] = initialize_func_maps( All_eig_vals, All_constraints,params.flip+1, params.gbvs_weight, graph_weights);

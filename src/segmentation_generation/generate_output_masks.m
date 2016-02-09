@@ -1,4 +1,5 @@
-function [output_masks_final, output_masks_rough, output_consistentfunc] = visualize_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, imgsize, superpixels, which)
+function [output_masks_mrf, output_masks_unary, output_masks_rough, All_IOUS, output_consistentfunc] = ... 
+    generate_output_masks(image_dir_name, consistent_funcs, All_eig_vecs, imgsize, superpixels, proposals, caffenet_features)
 %% ===============================================================
 %% Computes final mask and creates figures
 % for more information on how the rough and final masks are generated,
@@ -30,8 +31,10 @@ if isempty(images)
 end
 
 output_consistentfunc = cell(1, length(images));
-output_masks_final = cell(1, length(images));
+output_masks_unary = cell(1, length(images));
 output_masks_rough = cell(1, length(images));
+
+All_IOUS = cell(1, length(images));
 for i = 1:length(images)
 
     image = imread([image_dir_name '/' images(i).name]);
@@ -61,26 +64,14 @@ for i = 1:length(images)
     end
     
     output_consistentfunc{i} = consistent_func_im;
-    final_mask = refine_consistentfunc_with_gop(consistent_func_im, image); % refined using 'gop'.  See section 6 of pdf for details.
-    output_masks_final{i} = final_mask; % final mask using gop
+    %[final_mask1, IOUs1] = refine_consistentfunc_with_gop(consistent_func_im, image); % refined using 'gop'.  See section 6 of pdf for details.
+    [mask_unary, IOUs] = refine_consistentfunc_with_proposals(consistent_func_im, image, proposals{i});
+    All_IOUS{i} = IOUs;
+    output_masks_unary{i} = mask_unary; % final mask using gop
     output_masks_rough{i} = logical(consistent_func_im); % rough mask after thresholding the consistent function
-      
+    
 end
 
-if ~isempty(which)
-    figure;
-end
-
-% =======================================================
-%% generate figure here if so desired
-
-    for j = 1:length(which)
-        image = imread([image_dir_name '/' images(which(j)).name]);
-        segmented_image_final = mask_to_segment(output_masks_final{which(j)}, image);
-        segmented_image_rough = mask_to_segment(output_masks_rough{which(j)}, image); 
-        subplot(3, length(which), 0*length(which) + j); imshow(output_consistentfunc{which(j)}); colormap('hot'); title('Generated Function', 'FontSize', 7);
-        subplot(3, length(which), 1*length(which) + j) ; imshow(segmented_image_rough); title('Rough Thresholding', 'FontSize', 7);
-        subplot(3, length(which), 2*length(which) + j); imshow(segmented_image_final); title('Final Output', 'FontSize', 7); 
-    end
+output_masks_mrf = obtain_best_segment_via_mrf(proposals, caffenet_features, All_IOUS, 0.5, 0.1);
 % ======================================================
 end

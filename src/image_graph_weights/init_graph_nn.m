@@ -1,4 +1,4 @@
-function final_weights = init_graph_gist_nn(image_dir_name, imgsize, num_nn, flip)
+function final_weights = init_graph_nn(image_dir_name, imgsize, num_nn, flip, feat_type, caffe_dir)
 %% ===================================================
 %% computes weights in image graph based on gist distance.  
 % See <http://people.csail.mit.edu/torralba/code/spatialenvelope/> for more
@@ -38,7 +38,7 @@ param.numberBlocks = 4;
 param.fc_prefilt = 4;
 % =======================================
 %% Compute and store all gist_descriptors
-all_gists = cell(length(images),flip);
+all_feats = cell(length(images),flip);
 
 for k = 1:flip
 for i = 1:length(images)
@@ -47,14 +47,22 @@ for i = 1:length(images)
         img = flip_image(img);
     end
     
+    if strcmp(feat_type, 'gist')
     [gist, param] = LMgist(img, '', param);
-    all_gists{i,k} = gist;
+    
+    all_feats{i,k} = gist;
+    end
+    
+    if strcmp(feat_type, 'caffenet')
+        features = compute_caffenet_features(img, 'fc7', caffe_dir);
+        all_feats{i, k} = features';
+    end
 end
 end
 % =========================================
 %% Find gist nearest neighbors for each image
-mat_all_gists_original = cell2mat(all_gists(:,1));
-mat_all_gists_flip = cell2mat(all_gists(:,flip));
+mat_all_gists_original = cell2mat(all_feats(:,1));
+mat_all_gists_flip = cell2mat(all_feats(:,flip));
 
 
 [IDX_orig, Distances_orig] = knnsearch(mat_all_gists_original,mat_all_gists_original, 'K', num_nn + 1);
@@ -69,7 +77,7 @@ weights_orig = zeros(length(images));
 for n = 1:length(images)
     for m = 1:num_nn - 1
         neighbor = IDX_orig(n, m + 1);
-        weights_orig(n,neighbor) = exp( -norm(all_gists{n,1} - all_gists{neighbor,1})/(sqrt(2)*sigma));
+        weights_orig(n,neighbor) = exp( -norm(all_feats{n,1} - all_feats{neighbor,1})/(sqrt(2)*sigma));
     end
 end
 
@@ -77,7 +85,7 @@ weights_flip = zeros(length(images));
 for n = 1:length(images)
     for m = 1:num_nn
         neighbor = IDX_flip(n, m + 1);
-        weights_flip(n,neighbor) = exp( -norm(all_gists{n,flip} - all_gists{neighbor,flip})/(sqrt(2)*sigma));
+        weights_flip(n,neighbor) = exp( -norm(all_feats{n,flip} - all_feats{neighbor,flip})/(sqrt(2)*sigma));
     end
 end
 % ============================================

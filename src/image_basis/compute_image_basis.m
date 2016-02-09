@@ -33,7 +33,7 @@ end
 
 All_eig_vecs = cell(length(images),flip);
 All_eig_vals = cell(length(images),flip);
-All_superpixels = cell(length(images), flip);
+%All_superpixels = cell(length(images), flip);
 
 
 % We use both the eigenvectors of the logical laplacian, and the image
@@ -42,7 +42,11 @@ opts.issym = 1;
 opts.isreal = 1;
 [laplcn_logical_pix, ~] = ICS_laplacian_nf(zeros(imgsize), 1, 1, 1);
 [eig_vecs_logical, eig_vals_logical] = eigs(laplcn_logical_pix, num_eigenvecs, 1e-10, opts);
-for z = 1:length(images)
+
+% =================================================
+%% All_superpixels is set to 0 if using pixels
+All_superpixels= 0;
+parfor z = 1:length(images)
     
     for z_flip = 1:flip
         if z_flip == 1
@@ -79,9 +83,7 @@ for z = 1:length(images)
             eig_vals = diag(vals);
             eig_vecs = eig_vecs(:,sorted_eig_val_indices);
             
-            % =================================================
-            %% All_superpixels is set to 0 if using pixels
-            All_superpixels= 0;
+
             
         elseif strcmp(type, 'superpixel')
             %% use superpixel basis instead
